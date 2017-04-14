@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(cpp_daemons_sample)
+project(libdaemons)
 
-add_subdirectory(lib)
-
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/cmake" ${CMAKE_MODULE_PATH})
+file(GLOB libdaemons_SOURCES
+	src/*.cc
+)
 
 if (NOT EXTRA_COMPILE_FLAGS)
 	set (EXTRA_COMPILE_FLAGS "-Wall -Wunused -march=nocona --std=c++14")
@@ -17,8 +17,11 @@ if (NOT EXTRA_LINKER_FLAGS)
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${EXTRA_LINKER_FLAGS}")
 endif()
-include_directories(
-	lib/include
-)
 
-add_subdirectory(daemon_sample)
+add_library(libdaemons STATIC ${libdaemons_SOURCES})
+set_target_properties(libdaemons PROPERTIES OUTPUT_NAME daemons)
+
+target_include_directories(libdaemons PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+	$<INSTALL_INTERFACE:include/libdaemons>
+)

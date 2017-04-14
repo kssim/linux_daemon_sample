@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include "sample.h"
+#include "daemon_sample.h"
 
 int main(int argc, char** argv) {
-    SampleClass test = SampleClass();
+    DaemonSample test = DaemonSample();
     test.Run();
 
     return 0;

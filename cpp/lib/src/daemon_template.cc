@@ -1,16 +1,17 @@
-#include "daemon_skeleton.h"
+#include "daemon_template.h"
 
-DaemonSkeleton::DaemonSkeleton() {
-  pid_file_ = "/var/run/"+DAEMON_NAME+".pid";
+DaemonTemplate::DaemonTemplate(const std::string &daemon_name) {
+  _daemon_name = daemon_name;
 
+  pid_file_ = "/var/run/"+_daemon_name+".pid";
   InitSyslog();
 }
 
-DaemonSkeleton::~DaemonSkeleton() {
+DaemonTemplate::~DaemonTemplate() {
   RemovePidFile();
 }
 
-void DaemonSkeleton::Daemonize() {
+void DaemonTemplate::Daemonize() {
   pid_t pid, sid;
 
   pid = fork();
@@ -30,24 +31,24 @@ void DaemonSkeleton::Daemonize() {
   close(STDERR_FILENO);
 }
 
-void DaemonSkeleton::InitSyslog() {
+void DaemonTemplate::InitSyslog() {
   setlogmask(LOG_UPTO(LOG_INFO));
-  openlog(DAEMON_NAME.c_str(), LOG_PID|LOG_CONS|LOG_NDELAY|LOG_PERROR, LOG_USER);
+  openlog(_daemon_name.c_str(), LOG_PID|LOG_CONS|LOG_NDELAY|LOG_PERROR, LOG_USER);
 }
 
-void DaemonSkeleton::CreatePidFile(pid_t pid) {
+void DaemonTemplate::CreatePidFile(pid_t pid) {
   std::ofstream pid_file(pid_file_);
   pid_file << pid << std::endl;
   pid_file.close();
 }
 
-void DaemonSkeleton::RemovePidFile() {
+void DaemonTemplate::RemovePidFile() {
   if (remove(pid_file_.c_str()) != 0) {
     syslog(LOG_INFO, "The pid file was not deleted.");
   }
 }
 
-void DaemonSkeleton::Run() {
+void DaemonTemplate::Run() {
   syslog(LOG_INFO, "Before setting for daemonize");
   BeforeDaemonize();
 

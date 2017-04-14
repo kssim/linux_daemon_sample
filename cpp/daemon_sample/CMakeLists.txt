@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(cpp_daemons_sample)
+project(daemon_sample)
 
-add_subdirectory(lib)
+include(GNUInstallDirs)
+include_directories(include)
 
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/cmake" ${CMAKE_MODULE_PATH})
+file(GLOB daemon_sample_SOURCES
+	src/*.cc)
 
 if (NOT EXTRA_COMPILE_FLAGS)
 	set (EXTRA_COMPILE_FLAGS "-Wall -Wunused -march=nocona --std=c++14")
@@ -17,8 +19,14 @@ if (NOT EXTRA_LINKER_FLAGS)
 	set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
 	set (CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} ${EXTRA_LINKER_FLAGS}")
 endif()
-include_directories(
-	lib/include
+
+add_library(daemon-lib STATIC ${daemon_sample_SOURCES})
+set_target_properties(daemon-lib PROPERTIES OUTPUT_NAME daemons)
+target_link_libraries(daemon-lib libdaemons)
+
+set(LIBRARIES
+	daemon-lib
 )
 
-add_subdirectory(daemon_sample)
+add_executable(daemon_sample ${daemon_sample_SOURCES})
+target_link_libraries(daemon_sample ${LIBRARIES})

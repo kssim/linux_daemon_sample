@@ -1,5 +1,5 @@
-#ifndef DAEMON_SKELETON_
-#define DAEMON_SKELETON_
+#ifndef DAEMON_TEMPLATE_
+#define DAEMON_TEMPLATE_
 
 #include <sys/stat.h>
 #include <unistd.h>
@@ -10,25 +10,24 @@
 #include <fstream>
 #include <string>
 
-const std::string DAEMON_NAME("skeleton");
-
-class DaemonSkeleton {
+class DaemonTemplate {
  public:
-  DaemonSkeleton();
-  virtual ~DaemonSkeleton();
+  DaemonTemplate(const std::string &daemon_name);
+  virtual ~DaemonTemplate();
   void Run();
 
  protected:
-  std::string pid_file_;
   virtual void BeforeDaemonize() {};
   virtual void AfterDaemonize() {};
   virtual void Processing() {};
 
  private:
+  std::string pid_file_;
+  std::string _daemon_name;
   void InitSyslog();
   void Daemonize();
   void CreatePidFile(pid_t pid);
   void RemovePidFile();
 };
 
-#endif	// DAEMON_SKELETON_
+#endif	// DAEMON_TEMPLATE_
