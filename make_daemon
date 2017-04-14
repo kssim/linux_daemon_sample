@@ -1,0 +1,55 @@
+#!/bin/bash
+
+CURRENT_PATH=`pwd`
+DAEMON_TEMPLATE_PATH="./cpp/daemon_sample/"
+
+NEW_DAEMON_NAME=""
+SAMPLE_DAEMON_NAME="daemon_sample"
+
+function copy_daemon_template()
+{
+	echo "Step 1. Copy daemon template."
+	cp -r $DAEMON_TEMPLATE_PATH $CURRENT_PATH
+}
+
+function set_daemon_name()
+{
+	echo "Step 2. Rename directory & file."
+	mv $SAMPLE_DAEMON_NAME $NEW_DAEMON_NAME
+	mv $NEW_DAEMON_NAME/src/$SAMPLE_DAEMON_NAME.cc $NEW_DAEMON_NAME/src/$NEW_DAEMON_NAME.cc
+	mv $NEW_DAEMON_NAME/include/$SAMPLE_DAEMON_NAME.h $NEW_DAEMON_NAME/include/$NEW_DAEMON_NAME.h
+
+	echo "Step 3. Set the daemon name."
+	sed -i "s/$SAMPLE_DAEMON_NAME/$NEW_DAEMON_NAME/g" $NEW_DAEMON_NAME/CMakeLists.txt
+	sed -i "s/$SAMPLE_DAEMON_NAME/$NEW_DAEMON_NAME/g" $NEW_DAEMON_NAME/src/$NEW_DAEMON_NAME.cc
+	sed -i "s/$SAMPLE_DAEMON_NAME/$NEW_DAEMON_NAME/g" $NEW_DAEMON_NAME/src/main.cc
+	sed -i "s/$SAMPLE_DAEMON_NAME/$NEW_DAEMON_NAME/g" $NEW_DAEMON_NAME/include/$NEW_DAEMON_NAME.h
+
+	pascal_case_new_daemon_name=`echo $NEW_DAEMON_NAME | sed -r 's/(^|_)([a-z])/\U\2/g'`
+	pascal_case_daemon_name=`echo $SAMPLE_DAEMON_NAME | sed -r 's/(^|_)([a-z])/\U\2/g'`
+	sed -i "s/$pascal_case_daemon_name/$pascal_case_new_daemon_name/g" $NEW_DAEMON_NAME/src/$NEW_DAEMON_NAME.cc
+	sed -i "s/$pascal_case_daemon_name/$pascal_case_new_daemon_name/g" $NEW_DAEMON_NAME/include/$NEW_DAEMON_NAME.h
+	sed -i "s/$pascal_case_daemon_name/$pascal_case_new_daemon_name/g" $NEW_DAEMON_NAME/src/main.cc
+
+	upper_sample_daemon_name=`echo $SAMPLE_DAEMON_NAME | tr /a-z/ /A-Z/`
+	upper_new_daemon_name=`echo $NEW_DAEMON_NAME | tr /a-z/ /A-Z/`
+	sed -i "s/$upper_sample_daemon_name/$upper_new_daemon_name/g" $NEW_DAEMON_NAME/include/$NEW_DAEMON_NAME.h
+}
+
+##################################################################
+
+
+if [ $# != 1 ]
+then
+	echo "usage) make_daemon [new daemon file name]"
+	exit 1
+fi
+
+NEW_DAEMON_NAME=$1
+
+copy_daemon_template
+set_daemon_name
+
+echo "Step 4. Finished generate '$NEW_DAEMON_NAME' daemon."
+
+exit 0
